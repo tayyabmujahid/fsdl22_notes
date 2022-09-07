@@ -2,7 +2,7 @@
 
 ----
 
-**Importance of working with data**
+##### **Importance of working with data**
 
 Data is persisted in raw form like xml but that needs to be 
 
@@ -10,12 +10,12 @@ The data that is annotated is as rich as possible meaning in this case of handwr
 
 Knowing data well will help you understand the task that is being planned and the model that is being trained. 
 
-**ngrok** : 
+##### **ngrok**  
 
 - This is a reverse proxy service , which in simple words puts your localhost service on the web. You don't have to worry of about port-forwarding or knowledge of firewalls
 - This helps in setting up a webservice
 
-**Installing label-studio using docker :**
+##### **Installing label-studio using docker :**
 
 - using `docker pull`[[url](https://docs.docker.com/engine/reference/commandline/pull/)] to pull the image from the registry  and then `docker run` to run the container
 
@@ -32,4 +32,22 @@ Knowing data well will help you understand the task that is being planned and th
     `docker run -it -p 8080:8080 -v $LABEL_STDIO_DATA/mydata:/label-studio/data heartexlabs/label-studio:latest`
 
 LABEL_STDIO_DATA is a folder imported into the ~./profile file pointing to a folder where the data will be persisted. This maps the filesystem of the container to that of the local machine
+
+#### **Labeling Data**
+
+##### Importing data into label studio
+
+###### csv
+
+upload the manifest.csv file
+
+###### aws S3
+
+##### 
+
+##### Setting up the labeling task
+
+- from settings select the OCR as template
+- The change the label to `line` or any other label name depending on the granuilarity that is needed.
+- then select draw rectangular box around a line then enter the text on that label
 
