@@ -51,3 +51,6 @@ upload the manifest.csv file
 - The change the label to `line` or any other label name depending on the granuilarity that is needed.
 - then select draw rectangular box around a line then enter the text on that label
 
+
+
+how does one create the manifest.csv file??
