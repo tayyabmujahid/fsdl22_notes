@@ -55,13 +55,17 @@ the manifest.csv file is just a list of url of all the images in the bucket
 
   
 
-  <img src="./assets/images/s3_label_std_infor.png" alt="image-20220811100624659" style="zoom: 60%;" align="left"/>
+  <img src="./assets/images/s3_label_std_infor.png" alt="image-20220811100624659" style="zoom: 50%;" align="left"/>
+
+
+
+
 
 **setting up destination storage**
 
 
 
-<img src="./assets/images/S3_dest.png" alt="image-20220811100624659" style="zoom: 60%;" align="left"/>
+<img src="./assets/images/S3_dest.png" alt="image-20220811100624659" style="zoom: 50%;" align="left"/>
 
 
 
@@ -71,7 +75,7 @@ the manifest.csv file is just a list of url of all the images in the bucket
 
 - Access key and secret key can be generated using the following steps([url](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html))
 
-  <img src="./assets/images/aws_access_key_proc.png" alt="image-20220811100624659" style="zoom: 100%;" align="left"/>
+  <img src="./assets/images/aws_access_key_proc.png" alt="image-20220811100624659" style="zoom: 50%;" align="left"/>
 
 
 
