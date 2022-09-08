@@ -12,8 +12,8 @@ Knowing data well will help you understand the task that is being planned and th
 
 ##### **ngrok**  
 
-- This is a reverse proxy service , which in simple words puts your localhost service on the web. You don't have to worry of about port-forwarding or knowledge of firewalls
-- This helps in setting up a webservice
+- This is a reverse proxy service , which in simple words puts your local-host service on the web. You don't have to worry of about port-forwarding or knowledge of firewalls
+- This helps in setting up a web service
 
 ##### **Installing label-studio using docker :**
 
@@ -31,26 +31,59 @@ Knowing data well will help you understand the task that is being planned and th
 
     `docker run -it -p 8080:8080 -v $LABEL_STDIO_DATA/mydata:/label-studio/data heartexlabs/label-studio:latest`
 
-LABEL_STDIO_DATA is a folder imported into the ~./profile file pointing to a folder where the data will be persisted. This maps the filesystem of the container to that of the local machine
+LABEL_STDIO_DATA is a folder imported into the ~./profile file pointing to a folder where the data will be persisted. This maps the file-system of the container to that of the local machine
 
-#### **Labeling Data**
+#### Data Labeling
 
-##### Importing data into label studio
+##### Importing unlabeled data into label studio
 
-###### csv
+###### *csv*
 
 upload the manifest.csv file
 
-###### aws S3
+the manifest.csv file is just a list of url of all the images in the bucket
 
-##### 
+**or**
+
+###### ***aws S3***
+
+**setting up source storage**
+
+-  `fsdl-public-assets` is a public bucket so it does not require special permissions but requires Access key and Secret key to be generated from the aws account.
+
+  fsdl connection information
+
+  <img src="./assets/images/s3_label_std_infor.png" alt="image-20220811100624659" style="zoom: 60%;" align="left"/>
+
+**setting up destination storage**
+
+<img src="./assets/images/S3_dest.png" alt="image-20220811100624659" style="zoom: 60%;" align="left"/>
+
+
+
+- Access key and secret key can be generated using the following steps([url](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html))
+
+  <img src="./assets/images/aws_access_key_proc.png" alt="image-20220811100624659" style="zoom: 100%;" align="left"/>
 
 ##### Setting up the labeling task
 
 - from settings select the OCR as template
-- The change the label to `line` or any other label name depending on the granuilarity that is needed.
+- The change the label to `line` or any other label name depending on the granularity that is needed.
 - then select draw rectangular box around a line then enter the text on that label
 
 
 
-how does one create the manifest.csv file??
+##### Labeling the data
+
+- draw bounding boxes on each line and enter the text in the label
+
+- once the labeling is finished go to settings to sync the annotation to the destination storage
+
+  
+
+
+
+
+
+
+
