@@ -92,12 +92,12 @@ the manifest.csv file is just a list of url of all the images in the bucket
 ##### Labeling the data
 
 - draw bounding boxes on each line and enter the text in the label
-
 - once the labeling is finished go to settings to sync the annotation to the destination storage
 
-  
 
 
+
+##### Convert Label Studio JSON to IAM
 
 
 
