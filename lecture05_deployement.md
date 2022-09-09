@@ -2,6 +2,12 @@
 
 ------
 
+[toc]
+
+
+
+
+
 - Model deployment is critical as it brings out the flaws and issues in the model and helps in evaluation of the model. 
 - With offline evaluation its easy to miss the subtle issues with the model
 - Only when the model is deployed that we see if it works well in real-time, ie when it starts interacting with the users or when it starts utilizing real world data.
@@ -106,8 +112,6 @@ by responding to the requests.
 
 **Complexity**: adds additional complexity to the application
 
-
-
 #### :arrow_right:  **REST APIs**
 
 serve predictions to canonically-formed HTTP requests. Alternatives are <u>GRPC</u> (with Tensorflow Serving) and <u>GraphQL</u>
@@ -119,157 +123,168 @@ There is no current standard for formatting requests and responses for Rest API 
 - Google Cloud expects a batch of inputs structured as a list called instances
 - Azure and AWS also have a different structure.
 
-#### **:arrow_right:Dependency Management for model servers**
+#### **:arrow_right: Dependency Management for model servers**
 
 Model predictions depend on code, model weights and dependencies all need to be present on your web server.
 
 Dependency cause trouble
 
-**Two Strategies**
+##### **Two Strategies**
 
-- ##### *CONSTRAIN THE DEPENDENCY OF YOUR MODEL*
+1. ***CONSTRAIN THE DEPENDENCY OF YOUR MODEL***
 
-   ONNX : standard neural network format
+ONNX : standard neural network format
 
-  define network in any language and run it consistently anywhere
+define network in any language and run it consistently anywhere
 
-  :x: **Cons:**
+:x: **Cons:**
 
-  - libraries change quickly and often bugs in translation code
-  - if there is some codel pre-processing, using python code, outside the ML framework then ONNX cannot handle it
+- libraries change quickly and often bugs in translation code
+- if there is some codel pre-processing, using python code, outside the ML framework then ONNX cannot handle it
 
-- ##### *CONTAINERS*(i.e Docker):heavy_check_mark:
 
-  Dockers vs. VM: 
 
-  VMs package the entire OS as well as the libraries and applications that are built on top of that OS
+2. ***CONTAINERS (i.e Docker)*** :heavy_check_mark:
 
-  A container like Docker removes that need by packaging the applications and libraries together
+Dockers vs. VM: 
 
-  - Common pattern is to <u>spin up a docker container for every discrete task</u>
+VMs package the entire OS as well as the libraries and applications that are built on top of that OS
 
-    for example for a web application there might be 4 containers 
+A container like Docker removes that need by packaging the applications and libraries together
 
-    - one for the web-server
-    - one for the database
-    - one for the job-queue
-    - one for the worker
-  
-  - Docker containers are created from [Docker files](https://docs.docker.com/engine/reference/builder/)
-  
-    Docker file runs a sequence of steps to define the environment where the code will run
-  
-  Docker has three [components](https://docs.docker.com/get-started/overview/)
-  
-  1. docker client : this is the primary way in which you interact with Docker. When commands such as `docker run` etc are used the client sends these commands to `dockerd`i.e the docker daemon. The `docker` command uses the Docker API.
-  2. docker daemon: These commands are executed by a **Docker Host**, which can run on either your laptop or your server (with more storage or more performance).
-  3. docker registry: the docker host talks to the registry where all the container you want are stored
-  
-  :arrow_forward: Other that docker there are few open source packages to containrize and serve ML models like 
-  
-  [Cog](https://github.com/replicate/cog), [BentoML](https://github.com/bentoml/BentoML) and [Truss](https://github.com/trussworks)
-  
-  They have standard way of defining the prediction service and a other is a YAML file the defines other dependencies and package versions that will go into Docker containers running on your laptop
-  
-  #### :arrow_right:Performance Optimization
-  
-  Once the basic first iteration model is deployed as  PoC certain optimizations can be carried out to make the model inference more efficient. To <u>improve ML models inference more efficient</u> the following areas must be looked into
-  
-  
-  
-  ##### GPU
-  
-  :heavy_check_mark:**Pros**:
-  
-  - GPU provide high throughput when traffic gets large and increase in users
-  
-  - if same GPU is used during training and inference time any issues of hardware incompatiblity can be eliminated.
-  
-  :x: **Cons**: they are more complex and expensive
-  
-  It is not necessary to host the model on a GPU if its trained on a GPU. Early versions of the model would work fine on a CPU.
-  
-  high through put can be achieved from a CPU it self at low cost
-  
-  
-  
-  ##### CONCURRENCY
-  
-  The model can be run concurrently on different CPUs or CPU cores on single host machine. This has to have careful thread tuning [[ref](https://robloxfan.club/how-we-scaled-bert-to-serve-1-billion-daily-requests-on-cpus/),[ref](https://www.youtube.com/watch?v=Nw77sEAn_Js)]
-  
-  
-  
-  ##### MODEL DISTILLATION
-  
-  Once there is a large model a smaller model can be trained that imitates the behaviour of the larger model. Teacher-Student approach is one way of doing it. Model distillation approach can be finicky if done from scratch and not frequently used in practice
-  
-  Better to use distilled version of popular models (like [DistilBert](https://huggingface.co/docs/transformers/model_doc/distilbert))
-  
-  
-  
-  ##### QUANTIZATION
-  
-  Approximating a neural network that uses floating-point numbers by a neural network to low bit width numbers like 16-bit or 8-bit. This trade-offs with accuracy but has immense performance and size gains. The accuracy lost if limited relative to performance gain.
-  
-  Recommended to use built-in quantization methods in [PyTorch](https://pytorch.org/blog/introduction-to-quantization-on-pytorch/) an Tensorflow.
-  
-  [HuggingFace Optimum](https://huggingface.co/docs/optimum) for HuggingFace pre-trained models.
-  
-  **Quantization-aware training** can also be done which results in higher accuracy.
-  
-  
-  
-  ###### **CACHING**
-  
-  If for some models where certain inputs are more common than others the results of the model's inference can be stored in the cache instead of calling the model for everytime.
-  
-  Basic way of doing caching is [functools library in python](https://docs.python.org/3/library/functools.html) 
-  
-  
-  
-  ##### BATCHING
-  
-  Higher throughput can be achieved when doing a prediction in parallel in a GPU.
-  
-  Wait until predictions are accumulated and then run those predictions to return it to user
-  
-  Complicated to implement, built-in to model hosting services
-  
-  @josh-tobin
-  
-  > I wouldn't recommend implementing it on your own. It's complicated because you have to write logic to handle timeouts, max batch size, make sure that the right prediction is being returned to the right caller, etc 
-  >
-  > you might want to check out ray serve's implementation if you want to build your own anyway: https://docs.ray.io/en/latest/serve/performance.html#serve-performance-batching-requests
-  
-  ##### SHARING THE GPU
-  
-  Your model may not take up all of the GPU memory with your inference batch size. **Why don't you run multiple models on the same GPU?** This is a place where you want to use a model serving solution that supports GPU sharing out of the box.
-  
-  LIBRARIES 
-  
-  There are offerings from TensorFlow, PyTorch, and third-party tools from NVIDIA and Anyscale. NVIDIA's choice is probably the most powerful but can be difficult to get started with. Starting with Anyscale's [Ray Serve](https://docs.ray.io/en/latest/serve/index.html) may be an easier way to get started.
-  
-  
-  
-  ## References/URL:
-  
-  1. [Hugging face](https://huggingface.co/)
-  2. [Gradio](https://gradio.app/)
-  3. [Roblox presentation](https://www.youtube.com/watch?v=Nw77sEAn_Js) - blog for performance optimization
-  4. [Research Guide: Model Distillation Techniques](https://heartbeat.comet.ml/research-guide-model-distillation-techniques-for-deep-learning-4a100801c0eb)
-  5. [DitilBert : HuggingFace](https://huggingface.co/docs/transformers/model_doc/distilbert) 
-  6. [PyTorch quantization](https://pytorch.org/blog/introduction-to-quantization-on-pytorch/)
-  7. [HuggingFace Optimum](https://huggingface.co/docs/optimum)  - hugging face quantization
-  8. [functools python](https://docs.python.org/3/library/functools.html) - basic python caching
-  9. [Ray Batching]( https://docs.ray.io/en/latest/serve/performance.html#serve-performance-batching-requests)- batching of predictions using Ray tool
-  
-  
-  
-  
-  
-  
-  
-  
+- Common pattern is to <u>spin up a docker container for every discrete task</u>
+
+  for example for a web application there might be 4 containers 
+
+  - one for the web-server
+  - one for the database
+  - one for the job-queue
+  - one for the worker
+
+- Docker containers are created from [Docker files](https://docs.docker.com/engine/reference/builder/)
+
+  Docker file runs a sequence of steps to define the environment where the code will run
+
+Docker has three [components](https://docs.docker.com/get-started/overview/)
+
+1. docker client : this is the primary way in which you interact with Docker. When commands such as `docker run` etc are used the client sends these commands to `dockerd`i.e the docker daemon. The `docker` command uses the Docker API.
+2. docker daemon: These commands are executed by a **Docker Host**, which can run on either your laptop or your server (with more storage or more performance).
+3. docker registry: the docker host talks to the registry where all the container you want are stored
+
+:arrow_forward: Other that docker there are few open source packages to containrize and serve ML models like 
+
+[Cog](https://github.com/replicate/cog), [BentoML](https://github.com/bentoml/BentoML) and [Truss](https://github.com/trussworks)
+
+They have standard way of defining the prediction service and a other is a YAML file the defines other dependencies and package versions that will go into Docker containers running on your laptop.
+
+#### :arrow_right: **Performance Optimization**
+
+Once the basic first iteration model is deployed as  PoC certain optimizations can be carried out to make the model inference more efficient. To <u>improve ML models inference more efficient</u> the following areas must be looked into
+
+##### GPU
+
+:heavy_check_mark:**Pros**:
+
+- GPU provide high throughput when traffic gets large and increase in users
+
+- if same GPU is used during training and inference time any issues of hardware incompatiblity can be eliminated.
+
+:x: **Cons**: they are more complex and expensive
+
+It is not necessary to host the model on a GPU if its trained on a GPU. Early versions of the model would work fine on a CPU.
+
+high through put can be achieved from a CPU it self at low cost
+
+
+
+##### CONCURRENCY
+
+The model can be run concurrently on different CPUs or CPU cores on single host machine. This has to have careful thread tuning [[ref](https://robloxfan.club/how-we-scaled-bert-to-serve-1-billion-daily-requests-on-cpus/),[ref](https://www.youtube.com/watch?v=Nw77sEAn_Js)]
+
+
+
+##### MODEL DISTILLATION
+
+Once there is a large model a smaller model can be trained that imitates the behaviour of the larger model. Teacher-Student approach is one way of doing it. Model distillation approach can be finicky if done from scratch and not frequently used in practice
+
+Better to use distilled version of popular models (like [DistilBert](https://huggingface.co/docs/transformers/model_doc/distilbert))
+
+
+
+##### QUANTIZATION
+
+Approximating a neural network that uses floating-point numbers by a neural network to low bit width numbers like 16-bit or 8-bit. This trade-offs with accuracy but has immense performance and size gains. The accuracy lost if limited relative to performance gain.
+
+Recommended to use built-in quantization methods in [PyTorch](https://pytorch.org/blog/introduction-to-quantization-on-pytorch/) an Tensorflow.
+
+[HuggingFace Optimum](https://huggingface.co/docs/optimum) for HuggingFace pre-trained models.
+
+**Quantization-aware training** can also be done which results in higher accuracy.
+
+
+
+##### **CACHING**
+
+If for some models where certain inputs are more common than others the results of the model's inference can be stored in the cache instead of calling the model for everytime.
+
+Basic way of doing caching is [functools library in python](https://docs.python.org/3/library/functools.html) 
+
+
+
+##### BATCHING
+
+Higher throughput can be achieved when doing a prediction in parallel in a GPU.
+
+Wait until predictions are accumulated and then run those predictions to return it to user
+
+Complicated to implement, built-in to model hosting services
+
+@josh-tobin
+
+> I wouldn't recommend implementing it on your own. It's complicated because you have to write logic to handle timeouts, max batch size, make sure that the right prediction is being returned to the right caller, etc 
+>
+> you might want to check out ray serve's implementation if you want to build your own anyway: https://docs.ray.io/en/latest/serve/performance.html#serve-performance-batching-requests
+
+##### SHARING THE GPU
+
+Your model may not take up all of the GPU memory with your inference batch size. **Why don't you run multiple models on the same GPU?** This is a place where you want to use a model serving solution that supports GPU sharing out of the box.
+
+LIBRARIES 
+
+There are offerings from TensorFlow, PyTorch, and third-party tools from NVIDIA and Anyscale. NVIDIA's choice is probably the most powerful but can be difficult to get started with. Starting with Anyscale's [Ray Serve](https://docs.ray.io/en/latest/serve/index.html) may be an easier way to get started.
+
+#### **:arrow_right: Horizontal Scaling**
+
+- For scaling the model to interact with large number of users performance optimization of the model on one server is not enough.
+- Multiple servers with same copy of the model running are required to handle the traffic. This is called **horizontal scaling**
+- A load-balancer distributes traffic to each machine this possible through two methods
+  - Container Orchestration
+  - Serverless
+- 
+
+
+
+
+
+## References/URLs:
+
+1. [Hugging face](https://huggingface.co/)
+2. [Gradio](https://gradio.app/)
+3. [Roblox presentation](https://www.youtube.com/watch?v=Nw77sEAn_Js) - blog for performance optimization
+4. [Research Guide: Model Distillation Techniques](https://heartbeat.comet.ml/research-guide-model-distillation-techniques-for-deep-learning-4a100801c0eb)
+5. [DitilBert : HuggingFace](https://huggingface.co/docs/transformers/model_doc/distilbert) 
+6. [PyTorch quantization](https://pytorch.org/blog/introduction-to-quantization-on-pytorch/)
+7. [HuggingFace Optimum](https://huggingface.co/docs/optimum)  - hugging face quantization
+8. [functools python](https://docs.python.org/3/library/functools.html) - basic python caching
+9. [Ray Batching]( https://docs.ray.io/en/latest/serve/performance.html#serve-performance-batching-requests)- batching of predictions using Ray tool
+
+
+
+
+
+
+
+
 
 
 
