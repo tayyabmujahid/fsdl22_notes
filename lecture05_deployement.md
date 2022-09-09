@@ -1,12 +1,10 @@
 # Deployment: Lecture 05
 
-------
+
 
 [toc]
 
-
-
-
+----
 
 - Model deployment is critical as it brings out the flaws and issues in the model and helps in evaluation of the model. 
 - With offline evaluation its easy to miss the subtle issues with the model
