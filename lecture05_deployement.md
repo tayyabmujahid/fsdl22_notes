@@ -247,20 +247,64 @@ Complicated to implement, built-in to model hosting services
 
 Your model may not take up all of the GPU memory with your inference batch size. **Why don't you run multiple models on the same GPU?** This is a place where you want to use a model serving solution that supports GPU sharing out of the box.
 
-LIBRARIES 
+##### LIBRARIES 
 
 There are offerings from TensorFlow, PyTorch, and third-party tools from NVIDIA and Anyscale. NVIDIA's choice is probably the most powerful but can be difficult to get started with. Starting with Anyscale's [Ray Serve](https://docs.ray.io/en/latest/serve/index.html) may be an easier way to get started.
 
 #### **:arrow_right: Horizontal Scaling**
 
 - For scaling the model to interact with large number of users performance optimization of the model on one server is not enough.
+
 - Multiple servers with same copy of the model running are required to handle the traffic. This is called **horizontal scaling**
+
 - A load-balancer distributes traffic to each machine this possible through two methods
-  - Container Orchestration
-  - Serverless
-- 
 
+  Container Orchestration
 
+  Serverless
+
+  
+
+##### CONTAINER ORCHESTRATION
+
+Kubernetes helps manage containerized applications and run them across machines
+
+Its an overkill to learn about it if the only goal is to deploy ML models
+
+Kubernetes associated frameworks: [Kubeflow](https://www.kubeflow.org/), [Seldon](https://www.seldon.io/)
+
+<img src="./assets/images/image14.png" alt="image-20220811100624659" style="zoom: 50%;" align="left"/>
+
+##### SERVERLESS FUNCTIONS
+
+Package the app code and dependencies in to a docker container. The docker container needs to have one entry point function that runs over and over again. For a ML model this would be `model.predict()`
+
+Then this docker container can be deployed to a service  like AWS lambda or Google Cloud Functions or Azure Functions. These manages everything else scaling , load balancing etc etc
+
+For serverless you pay only for the time that your service is active for 
+
+**<u>This is recommended approach once you pass the prototype application phase</u>**
+
+ :x: **Cons**
+
+- Limited size of deployment package
+- cold-start , if there are not requests to the model the serverless function takes a while to load/startup when a new requests comes
+- can be difficult to build pipelines and iterate. serverless functions donot have tools to support rapid iteration and automated changes to code
+- state management, caching and deployment tooling are challanges here
+- CPU only, limited or no GPU support. Alternative solutions like [Banana](https://www.banana.dev/) and [Pipeline](https://www.pipeline.ai/) for serverless GPU inferencing
+
+#### :arrow_right: MODEL ROLLOUTS
+
+1. **Roll out gradually** : incrementally send traffic to new model
+2. **Roll back instantly**: immediately pull back if a model is performing poorly
+3. **split traffic between versions**: test differences between models
+4. **Deploy pipelines of models**: run shadow versions of the new model to test and then rollout the model
+
+Building these capabilities in a reasonably challenging infrastructure problem that is beyond the scope of this course. In short, managed services are a good option for this that we'll now discuss!
+
+#### :arrow_right: Managed Options
+
+<img src="./assets/images/image9.png" alt="image-20220811100624659" style="zoom: 50%;" align="left"/>
 
 
 
@@ -275,6 +319,14 @@ There are offerings from TensorFlow, PyTorch, and third-party tools from NVIDIA 
 7. [HuggingFace Optimum](https://huggingface.co/docs/optimum)  - hugging face quantization
 8. [functools python](https://docs.python.org/3/library/functools.html) - basic python caching
 9. [Ray Batching]( https://docs.ray.io/en/latest/serve/performance.html#serve-performance-batching-requests)- batching of predictions using Ray tool
+10. [TFServe Batching](https://github.com/tensorflow/serving/blob/master/tensorflow_serving/batching/README.md) : Batching of batch transform implementation of Tensorflow serving
+11. [NVIDIA Triton](https://developer.nvidia.com/nvidia-triton-inference-server): GPU serving
+12. [Kubeflow](https://www.kubeflow.org/) : container orchestration
+13. [Seldon](https://www.seldon.io/): container orchestration
+14. [Banana](https://www.banana.dev/): serverless GPU inferencing
+15. [Pipeline](https://www.pipeline.ai/): serverless GPU inferencing
+
+
 
 
 
