@@ -300,13 +300,19 @@ For serverless you pay only for the time that your service is active for
 3. **split traffic between versions**: test differences between models
 4. **Deploy pipelines of models**: run shadow versions of the new model to test and then rollout the model
 
-Building these capabilities in a reasonably challenging infrastructure problem that is beyond the scope of this course. In short, managed services are a good option for this that we'll now discuss!
+Building these capabilities in a reasonably challenging infrastructure problem that is beyond the scope of this course. In short, managed services are a good option
 
 #### :arrow_right: Managed Options
 
 <img src="./assets/images/image9.png" alt="image-20220811100624659" style="zoom: 50%;" align="left"/>
 
+### Summary 
 
+1. You *probably* don't need GPU inference, which is hard to access and maintain. Scaling CPUs horizontally or using serverless can compensate.
+2. Serverless is probably the way to go!
+3. Sagemaker is a great way to get started for the AWS user, but it can get quite expensive.
+4. Don't try to do your own GPU inference; use existing tools like TFServing or Triton to save time.
+5. Watch out for new startups focused on GPU inference.
 
 ## References/URLs:
 
