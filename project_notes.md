@@ -18,14 +18,3 @@ Successfully ran the train.py code.
     - Performance Metric
       - 
 
-
-
-
-<iframe src="https://www.kaggle.com/embed/balraj98/deepglobe-land-cover-classification-deeplabv3?cellIds=37&kernelSessionId=46628687" height="300" style="margin: 0 auto; width: 100%; max-width: 950px;" frameborder="0" scrolling="auto" title="DeepGlobe Land Cover Classification [DeepLabV3+]"></iframe>
-
-
-
-
-
-
-
